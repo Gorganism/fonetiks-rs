@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 input_loop = "0.1.3"
+cmudict-fast = "0.8.0"
