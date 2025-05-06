@@ -23,6 +23,7 @@ fn main() {
     let mut phoneme_sets = [
         ("DH", HashSet::new()), 
         ("TH", HashSet::new()),
+        ("Z", HashSet::new()),
         ("AE", HashSet::new()),
         ("OW", HashSet::new()),
     ];
@@ -59,16 +60,17 @@ fn main() {
     ];
 
     let rune_replacements: Vec<(&str, &str)> = vec![
-        ("ᛒᛥ", "v"), ("ᛋᛥ", "z"), ("ᚪ", "a"), ("ᛒ", "b"), ("ᚳ", "ch"), 
-        ("ᛞ", "d"), ("ᛖ", "e"), ("ᚠ", "f"), ("ᚷ", "g"), ("ᚻ", "h"), ("ᛁ", "i"), 
-        ("ᛡ", "j"), ("ᛣ", "k"), ("ᛚ", "l"), ("ᛗ", "m"), ("ᚾ", "n"), 
-        ("ᚩ", "o"), ("ᛈ", "p"), ("ᛢ", "q"), ("ᚱ", "r"), ("ᛋ", "s"), ("ᛏ", "t"), 
-        ("ᚢ", "u"), ("ᚹ", "w"), ("ᛉ", "x"), ("ᚣ", "y"), ("ᛇ", "ai"), 
-        ("ᚫ", "ae"), ("ᚦ", "þ"), ("ᛝ", "ng"), ("ᛠ", "ea"), ("ᛟ", "oe"), ("•", " ")
+        ("ᛒᛥ", "v"), ("ᛋᛥ", "z"), ("ᚪ", "a"), ("ᛒ", "b"), ("ᚳ", "ch"),
+        ("ᛞ", "d"), ("ᛖ", "e"), ("ᚠ", "f"), ("ᚷ", "g"), ("ᚻ", "h"), ("ᛁ", "i"),
+        ("ᛡ", "j"), ("ᛣ", "k"), ("ᛚ", "l"), ("ᛗ", "m"), ("ᚾ", "n"),
+        ("ᚩ", "o"), ("ᛈ", "p"), ("ᛢ", "q"), ("ᚱ", "r"), ("ᛋ", "s"), ("ᛏ", "t"),
+        ("ᚢ", "u"), ("ᚹ", "w"), ("ᛉ", "x"), ("ᚣ", "y"), ("ᛇ", "ai"),
+        ("ᚫ", "ae"), ("ᚦ", "ð"), // Changed from "þ" to "ð"
+        ("ᛝ", "ng"), ("ᛠ", "ea"), ("ᛟ", "oe"), ("•", " ")
     ];
-
+    
     let runes: Vec<(&str, &str)> = vec![
-        ("h", "ᚻ"), ("f", "ᚠ"), ("u", "ᚢ"), ("ð", "ᚦ"), ("þ", "ᚦ"), 
+        ("th", "ᚦ"), ("h", "ᚻ"), ("f", "ᚠ"), ("u", "ᚢ"), ("ð", "ᚦ"), ("þ", "ᚦ"), 
         ("o", "ᚩ"), ("r", "ᚱ"), ("c", "ᚳ"), ("g", "ᚷ"), ("w", "ᚹ"),
         ("n", "ᚾ"), ("i", "ᛁ"), ("j", "ᛡ"), ("p", "ᛈ"), ("ks", "ᛉ"), 
         ("s", "ᛋ"), ("t", "ᛏ"), ("b", "ᛒ"), ("e", "ᛖ"), ("m", "ᛗ"), 
@@ -78,28 +80,35 @@ fn main() {
     ];
 
     let mut result = english.clone();
-
     let contains_runes = rune_replacements.iter().any(|(rune_char, _)| english.contains(rune_char));
-
     if contains_runes {
         for (rune_char, phonetic_char) in &rune_replacements {
             if result.contains(rune_char) {
-                result = result.replace(rune_char, phonetic_char);
-            }
-        }
+                let temp_result = result.replace(rune_char, phonetic_char);
 
-        for word in &phoneme_sets[0].1 {
-            if word.contains("th") && word != "with" {
-                result = result.replace(word, &format!("ð{}", &word[2..]));
-            }
-        }
-
-        for word in &phoneme_sets[1].1 {
-            if word.contains("th") && word != "with" {
-                result = result.replace(word, &format!("þ{}", &word[2..]));
+                if temp_result.contains("th") {
+                    if phoneme_sets[0].1.contains(&temp_result) {
+                        result = temp_result.replace("th", "ð");
+                    } else if phoneme_sets[1].1.contains(&temp_result) {
+                        result = temp_result.replace("th", "þ");
+                    } else {
+                        result = temp_result;
+                    }
+                } else {
+                    result = temp_result;
+                }
             }
         }
     }
+    
+    for word in &phoneme_sets[2].1 {
+        if word.contains("s") {
+            result = word.split("s")
+                .map(|s| s.to_string())
+                .collect::<String>() + "z";
+        }
+    }
+
     for (from, to) in &replacements {
         result = result.replace(from, to);
     }
