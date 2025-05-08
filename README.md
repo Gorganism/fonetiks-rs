@@ -16,12 +16,11 @@ This is an example of the script in action. Ðis is æn eksæmple ov ðe skript 
 ## How to assist 
 Make a seprate fork then make a pull request so we can review and add your changes. But keep your vibe coding out of our project!
 ## Changes to major build
-- rewriting the program in rust
+- merged another PR from SalladShooter
+- removed package 'wordnet' because nltk stopped complaining on my machine
+- soft g to j sometimes, needs work
 ## Minor changes
-- none recently
-## Todo
-- implement Qt UI for the rust version
-- eventually get rust version to look identical to python version
+- more replacements
 ## Guide To The Letters (Fonetiks):
 - Þ þ - th : [th]istle, ma[th] - [þ]istle, ma[þ]
 - Ð ð - th : [th]e, [th]at - [ð]e, [ð]æt
