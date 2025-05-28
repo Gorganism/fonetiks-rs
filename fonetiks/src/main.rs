@@ -12,35 +12,6 @@ fn main() {
         }
     };
 
-    let mut english: String = input_loop("Input a string: ");
-    english = english.to_lowercase();
-
-    let words: Vec<String> = english
-        .split_whitespace()
-        .map(|word| word.to_lowercase())
-        .collect();
-
-    let mut phoneme_sets = [
-        ("DH", HashSet::new()), 
-        ("TH", HashSet::new()),
-        ("Z", HashSet::new()),
-        ("AE", HashSet::new()),
-        ("OW", HashSet::new()),
-    ];
-
-    for word in &words {
-        if let Some(pronunciations) = dict.get(word) {
-            for pronunciation in pronunciations {
-                for (phoneme, set) in &mut phoneme_sets {
-                    let pron_str = format!("{:?}", pronunciation);
-                    if pron_str.contains(*phoneme) {
-                        set.insert(word.clone());
-                    }
-                }
-            }
-        }
-    }
-
     let replacements = vec![
         ("thom", "tom"), ("coope", "cöpe"), ("co-op", "cöp"), ("alk", "ak"),
         ("sh", "ʃ"), ("tio", "ʃo"), ("sio", "ʃo"), ("sure", "ʃur"),
@@ -79,47 +50,86 @@ fn main() {
         ("k", "ᛣ"), ("q", "ᛢ"), ("v", "ᛒᛥ"), ("z", "ᛋᛥ"), (" ", "•"),
     ];
 
-    let mut result = english.clone();
-    let contains_runes = rune_replacements.iter().any(|(rune_char, _)| english.contains(rune_char));
-    if contains_runes {
-        for (rune_char, phonetic_char) in &rune_replacements {
-            if result.contains(rune_char) {
-                let temp_result = result.replace(rune_char, phonetic_char);
 
-                if temp_result.contains("th") {
-                    if phoneme_sets[0].1.contains(&temp_result) {
-                        result = temp_result.replace("th", "ð");
-                    } else if phoneme_sets[1].1.contains(&temp_result) {
-                        result = temp_result.replace("th", "þ");
-                    } else {
-                        result = temp_result;
+    let mut run: i32 = 1;
+    while run == 1{
+        let mut english: String = input_loop("Input a string: ");
+        english = english.to_lowercase();
+
+        let words: Vec<String> = english
+            .split_whitespace()
+            .map(|word| word.to_lowercase())
+            .collect();
+
+        let mut phoneme_sets = [
+            ("DH", HashSet::new()), 
+            ("TH", HashSet::new()),
+            ("Z", HashSet::new()),
+            ("AE", HashSet::new()),
+            ("OW", HashSet::new()),
+        ];
+
+        for word in &words {
+            if let Some(pronunciations) = dict.get(word) {
+                for pronunciation in pronunciations {
+                    for (phoneme, set) in &mut phoneme_sets {
+                        let pron_str = format!("{:?}", pronunciation);
+                        if pron_str.contains(*phoneme) {
+                            set.insert(word.clone());
+                        }
                     }
-                } else {
-                    result = temp_result;
                 }
             }
         }
-    }
-    
-    for word in &phoneme_sets[2].1 {
-        if word.contains("s") {
-            result = word.split("s")
-                .map(|s| s.to_string())
-                .collect::<String>() + "z";
+
+        
+
+        let mut result = english.clone();
+        let contains_runes = rune_replacements.iter().any(|(rune_char, _)| english.contains(rune_char));
+        if contains_runes {
+            for (rune_char, phonetic_char) in &rune_replacements {
+                if result.contains(rune_char) {
+                    let temp_result = result.replace(rune_char, phonetic_char);
+
+                    if temp_result.contains("th") {
+                        if phoneme_sets[0].1.contains(&temp_result) {
+                            result = temp_result.replace("th", "ð");
+                        } else if phoneme_sets[1].1.contains(&temp_result) {
+                            result = temp_result.replace("th", "þ");
+                        } else {
+                            result = temp_result;
+                        }
+                    } else {
+                        result = temp_result;
+                    }
+                }
+            }
         }
-    }
+        
+        for word in &phoneme_sets[2].1 {
+            if word.contains("s") {
+                    if word != "is"{
+                    result = word.split("s")
+                        .map(|s| s.to_string())
+                        .collect::<String>() + "z";
+                    }
+            }
+        }
 
-    for (from, to) in &replacements {
-        result = result.replace(from, to);
-    }
+        for (from, to) in &replacements {
+            result = result.replace(from, to);
+        }
 
-    let mut rune_result: String = result.clone().to_lowercase();
-    for (from, to) in &runes {
-        rune_result = rune_result.replace(from, to);
-    }
+        let mut rune_result: String = result.clone().to_lowercase();
+        for (from, to) in &runes {
+            rune_result = rune_result.replace(from, to);
+        }
 
-    println!("Fonetiks: {}", result);
-    if !contains_runes {
-        println!("Runetiks: {}", rune_result)
+        println!("Fonetiks: {}", result);
+        if !contains_runes {
+            println!("Runetiks: {}", rune_result)
+        }
+        run = input_loop("\nWould you like to run this again?\n1 for yes");
     }
+    println!("\nThank you to using this script!\n")
 }
