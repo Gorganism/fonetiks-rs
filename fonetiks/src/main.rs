@@ -129,7 +129,11 @@ fn main() {
         if !contains_runes {
             println!("Runetiks: {}", rune_result)
         }
-        run = input_loop("\nWould you like to run this again?\n1 for yes");
+        let mut do_run: String = input_loop("\nWould you like to run this again?\n[Y/n]");
+        do_run = do_run.to_lowercase();
+        if do_run == "n"{
+            run = 0;
+        }
     }
     println!("\nThank you to using this script!\n")
 }
